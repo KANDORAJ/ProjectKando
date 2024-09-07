@@ -1,17 +1,18 @@
-/* Genel Stiller */
+/* General Styles */
 body {
   font-family: 'Roboto', sans-serif;
   background: linear-gradient(135deg, #ece9e6, #ffffff);
   margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 20px 0;
   height: 100vh;
 }
 
 /* Container */
 .container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   background-color: white;
   padding: 40px;
   border-radius: 12px;
@@ -22,7 +23,7 @@ body {
   text-align: center;
 }
 
-/* Başlıklar */
+/* Headers */
 h1 {
   color: #333;
   font-size: 36px;
@@ -43,7 +44,7 @@ nav ul {
   padding: 0;
   display: flex;
   justify-content: center;
-  margin-bottom: 30px;
+  margin-bottom: 50px; 
 }
 
 nav ul li {
@@ -62,10 +63,10 @@ nav ul li a:hover {
   background-color: #e8f0fe;
 }
 
-/* Input Alanı */
+/* Input Area */
 input[type="text"], select {
   padding: 10px;
-  margin-right: 10px;
+  margin: 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
   width: calc(50% - 10px);
@@ -80,14 +81,14 @@ button {
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  margin: 0 5px;
+  margin: 10px 5px;
 }
 
 button:hover {
   background-color: #218838;
 }
 
-/* Görev Listesi */
+/* Task List */
 ul {
   list-style-type: none;
   padding: 0;
@@ -129,7 +130,7 @@ li button:hover {
   background-color: #c82333;
 }
 
-/* Edit ve Save Butonları */
+/* Edit and Save Buttons */
 li span input {
   padding: 8px;
   margin-right: 10px;
@@ -145,7 +146,7 @@ li button:first-child:hover {
   background-color: #0056b3;
 }
 
-/* Seçim Kutusu */
+/* Selection Box */
 select {
   padding: 10px;
   border-radius: 6px;
@@ -162,7 +163,7 @@ label {
   margin-right: 10px;
 }
 
-/* Responsive Tasarım */
+/* Responsive Design */
 @media (max-width: 600px) {
   .container {
     padding: 20px;
