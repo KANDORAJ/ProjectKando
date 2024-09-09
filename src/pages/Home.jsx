@@ -1,17 +1,18 @@
 import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { v4 as uuidv4 } from "uuid";
 
 function Home() {
     const [task, setTask] = useState("");
     const [tasks, setTasks] = useState([]);
     const [editingIndex, setEditingIndex] = useState(null);
     const [editingText, setEditingText] = useState("");
-    const [category, setCategory] = useState(""); 
-    const [filterCategory, setFilterCategory] = useState(""); 
+    const [category, setCategory] = useState("");
+    const [filterCategory, setFilterCategory] = useState("");
 
     const addTask = () => {
         if (task.trim() !== "") {
-            setTasks([...tasks, { text: task, completed: false, category }]);
+            setTasks([...tasks, { id: uuidv4(), text: task, completed: false, category }]);
             setTask("");
             setCategory("");
         }
@@ -44,9 +45,8 @@ function Home() {
     };
 
     const onDragEnd = (result) => {
-        if (!result.destination) {
-            return;
-        }
+        if (!result.destination) return;
+
         const reorderedTasks = Array.from(tasks);
         const [removed] = reorderedTasks.splice(result.source.index, 1);
         reorderedTasks.splice(result.destination.index, 0, removed);
@@ -81,20 +81,20 @@ function Home() {
             </div>
 
             <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId="tasks">
+                <Droppable droppableId="droppable-tasks">
                     {(provided) => (
-                        <ul {...provided.droppableProps} ref={provided.innerRef}>
+                        <ul {...provided.droppableProps} ref={provided.innerRef} style={{ padding: 0 }}>
                             {tasks
                                 .filter(task => filterCategory === "" || task.category === filterCategory)
                                 .map((task, index) => (
-                                    <Draggable key={index} draggableId={index.toString()} index={index}>
+                                    <Draggable key={task.id} draggableId={task.id} index={index}>
                                         {(provided) => (
-                                            <li 
-                                                ref={provided.innerRef} 
-                                                {...provided.draggableProps} 
+                                            <li
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
                                                 {...provided.dragHandleProps}
-                                                style={{ 
-                                                    ...provided.draggableProps.style, 
+                                                style={{
+                                                    ...provided.draggableProps.style,
                                                     textDecoration: task.completed ? 'line-through' : 'none',
                                                     display: 'flex',
                                                     justifyContent: 'space-between',
@@ -103,6 +103,8 @@ function Home() {
                                                     padding: '10px',
                                                     marginBottom: '5px',
                                                     borderRadius: '5px',
+                                                    border: '1px solid #ddd',
+                                                    userSelect: 'none'  // Sürükleme sırasında metin seçilmesin
                                                 }}
                                             >
                                                 {editingIndex === index ? (
