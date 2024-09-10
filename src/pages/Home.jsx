@@ -81,59 +81,71 @@ function Home() {
             </div>
 
             <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId="droppable-tasks">
-                    {(provided) => (
-                        <ul {...provided.droppableProps} ref={provided.innerRef} style={{ padding: 0 }}>
-                            {tasks
-                                .filter(task => filterCategory === "" || task.category === filterCategory)
-                                .map((task, index) => (
-                                    <Draggable key={task.id} draggableId={task.id} index={index}>
-                                        {(provided) => (
-                                            <li
-                                                ref={provided.innerRef}
-                                                {...provided.draggableProps}
-                                                {...provided.dragHandleProps}
-                                                style={{
-                                                    ...provided.draggableProps.style,
-                                                    textDecoration: task.completed ? 'line-through' : 'none',
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    alignItems: 'center',
-                                                    backgroundColor: '#f9f9f9',
-                                                    padding: '10px',
-                                                    marginBottom: '5px',
-                                                    borderRadius: '5px',
-                                                    border: '1px solid #ddd',
-                                                    userSelect: 'none'  // Sürükleme sırasında metin seçilmesin
-                                                }}
-                                            >
-                                                {editingIndex === index ? (
-                                                    <span>
-                                                        <input
-                                                            type="text"
-                                                            value={editingText}
-                                                            onChange={(e) => setEditingText(e.target.value)}
-                                                        />
-                                                        <button onClick={() => saveTask(index)}>Save</button>
-                                                    </span>
-                                                ) : (
-                                                    <span onClick={() => toggleTaskCompletion(index)}>
-                                                        {task.text} ({task.category})
-                                                    </span>
-                                                )}
-                                                <button onClick={() => deleteTask(index)}>Delete</button>
-                                                {editingIndex !== index && (
-                                                    <button onClick={() => startEditing(index)}>Edit</button>
-                                                )}
-                                            </li>
-                                        )}
-                                    </Draggable>
-                                ))}
-                            {provided.placeholder}
-                        </ul>
-                    )}
-                </Droppable>
-            </DragDropContext>
+    <Droppable droppableId="droppable-tasks">
+        {(provided) => (
+            <ul
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                style={{ padding: 0 }}
+            >
+                {tasks
+                    .filter(task => filterCategory === "" || task.category === filterCategory)
+                    .map((task, index) => (
+                        <Draggable key={task.id} draggableId={task.id} index={index}>
+                            {(provided) => (
+                                <li
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                style={{
+                                  ...provided.draggableProps.style,
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                  backgroundColor: '#f9f9f9',
+                                  padding: '10px',
+                                  marginBottom: '5px',
+                                  borderRadius: '5px',
+                                  border: '1px solid #ddd',
+                                  userSelect: 'none',  // Sürükleme sırasında metin seçilmesin
+                                }}
+                              >
+                                {editingIndex === index ? (
+                                  <span style={{ flex: 1, marginRight: '10px' }}>
+                                    <input
+                                      type="text"
+                                      value={editingText}
+                                      onChange={(e) => setEditingText(e.target.value)}
+                                    />
+                                    <button onClick={() => saveTask(index)}>Save</button>
+                                  </span>
+                                ) : (
+                                  <span
+                                    onClick={() => toggleTaskCompletion(index)}
+                                    style={{
+                                      textDecoration: task.completed ? 'line-through' : 'none',
+                                      flex: 1,  // Metnin genişleyebilmesi için
+                                      marginRight: '10px'  // Butonlar ile metin arasında boşluk
+                                    }}
+                                  >
+                                    {task.text} ({task.category})
+                                  </span>
+                                )}
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                  <button onClick={() => deleteTask(index)}>Delete</button>
+                                  {editingIndex !== index && (
+                                    <button onClick={() => startEditing(index)}>Edit</button>
+                                  )}
+                                </div>
+                              </li>
+                            )}
+                        </Draggable>
+                    ))}
+                {provided.placeholder}
+            </ul>
+        )}
+    </Droppable>
+</DragDropContext>
         </div>
     );
 }
