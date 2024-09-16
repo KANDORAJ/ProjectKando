@@ -1,11 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DndContext } from "@dnd-kit/core";
-import {
-  SortableContext,
-  useSortable,
-  arrayMove,
-  sortableKeyboardCoordinates,
-} from "@dnd-kit/sortable";
+import { SortableContext, useSortable, arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { v4 as uuidv4 } from "uuid";
@@ -69,10 +64,25 @@ function Home() {
   const [category, setCategory] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
 
+  // Load tasks from localStorage when component mounts
+  useEffect(() => {
+    const savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    setTasks(savedTasks);
+    console.log("Tasks loaded from localStorage:", savedTasks);
+  }, []);
+
+  // Save tasks to localStorage whenever tasks state changes
+  useEffect(() => {
+    if (tasks.length > 0) {
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+      console.log("Tasks updated:", tasks);
+    }
+  }, [tasks]);
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 10, // 10 px to start the movement
+        distance: 10,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -152,10 +162,10 @@ function Home() {
       </div>
 
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-        <SortableContext items={tasks.map(task => task.id)}>
+        <SortableContext items={tasks.map((task) => task.id)}>
           <ul style={{ padding: 0 }}>
             {tasks
-              .filter(task => filterCategory === "" || task.category === filterCategory)
+              .filter((task) => filterCategory === "" || task.category === filterCategory)
               .map((task, index) => (
                 <SortableItem
                   key={task.id}
