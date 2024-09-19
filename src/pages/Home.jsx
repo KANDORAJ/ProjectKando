@@ -9,13 +9,15 @@ import { v4 as uuidv4 } from "uuid";
 function SortableItem({ id, task, index, onDelete, onEdit, toggleCompletion, editingIndex, setEditingIndex, editingText, setEditingText, saveTask }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
 
+  const backgroundColor = categoryColors[task.category] || categoryColors.Default;
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#f9f9f9',
+    backgroundColor,
     padding: '10px',
     marginBottom: '5px',
     borderRadius: '5px',
@@ -26,7 +28,7 @@ function SortableItem({ id, task, index, onDelete, onEdit, toggleCompletion, edi
   return (
     <li ref={setNodeRef} style={style} {...attributes} {...listeners}>
       {editingIndex === index ? (
-        <span style={{ flex: 1, marginRight: '10px' }}>
+        <span style={{ flex: 1, marginRight: "10px" }}>
           <input
             type="text"
             value={editingText}
@@ -38,23 +40,28 @@ function SortableItem({ id, task, index, onDelete, onEdit, toggleCompletion, edi
         <span
           onClick={() => toggleCompletion(index)}
           style={{
-            textDecoration: task.completed ? 'line-through' : 'none',
+            textDecoration: task.completed ? "line-through" : "none",
             flex: 1,
-            marginRight: '10px',
+            marginRight: "10px",
           }}
         >
           {task.text} ({task.category})
         </span>
       )}
-      <div style={{ display: 'flex', gap: '10px' }}>
+      <div style={{ display: "flex", gap: "10px" }}>
         <button onClick={() => onDelete(index)}>Delete</button>
-        {editingIndex !== index && (
-          <button onClick={() => onEdit(index)}>Edit</button>
-        )}
+        {editingIndex !== index && <button onClick={() => onEdit(index)}>Edit</button>}
       </div>
     </li>
   );
 }
+
+const categoryColors = {
+  Work: "#FFD700", 
+  Home: "#87CEEB", 
+  Personal: "#FFB6C1", 
+  Default: "#f9f9f9", 
+};
 
 function Home() {
   const [task, setTask] = useState("");
@@ -78,6 +85,7 @@ function Home() {
       console.log("Tasks updated:", tasks);
     }
   }, [tasks]);
+
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
