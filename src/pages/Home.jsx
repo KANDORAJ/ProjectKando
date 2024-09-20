@@ -5,6 +5,7 @@ import { KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/c
 import { CSS } from "@dnd-kit/utilities";
 import { v4 as uuidv4 } from "uuid";
 
+
 // SortableItem component for draggable list items
 function SortableItem({ id, task, index, onDelete, onEdit, toggleCompletion, editingIndex, setEditingIndex, editingText, setEditingText, saveTask }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
@@ -70,6 +71,7 @@ function Home() {
   const [editingText, setEditingText] = useState("");
   const [category, setCategory] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
+  const [darkMode, setDarkMode] = useState(false);
 
   // Load tasks from localStorage when component mounts
   useEffect(() => {
@@ -142,9 +144,18 @@ function Home() {
     }
   };
 
+  /*Dark Mode*/
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+    document.body.classList.toggle('dark-mode', !darkMode);
+  };
+
   return (
     <div className="container">
       <h2>Task List</h2>
+      <button onClick={toggleDarkMode}>
+        {darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+      </button>
       <input
         type="text"
         value={task}
