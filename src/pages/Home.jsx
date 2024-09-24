@@ -4,6 +4,7 @@ import { SortableContext, useSortable, arrayMove, sortableKeyboardCoordinates } 
 import { KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { v4 as uuidv4 } from "uuid";
+import TaskDetailsModal from '../components/TaskDetailsModal';
 
 
 // SortableItem component for draggable list items
@@ -72,6 +73,8 @@ function Home() {
   const [category, setCategory] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [darkMode, setDarkMode] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Load tasks from localStorage when component mounts
   useEffect(() => {
@@ -102,7 +105,7 @@ function Home() {
 
   const addTask = () => {
     if (task.trim() !== "") {
-      setTasks([...tasks, { id: uuidv4(), text: task, completed: false, category }]);
+      setTasks([...tasks, { id: uuidv4(), text: task, completed: false, category, details: "" }]);
       setTask("");
       setCategory("");
     }
@@ -150,6 +153,28 @@ function Home() {
     document.body.classList.toggle('dark-mode', !darkMode);
   };
 
+  // Function to save task details
+  const saveTaskDetails = (details) => {
+    const updatedTasks = tasks.map((task) =>
+      task.id === selectedTask.id ? { ...task, details } : task
+    );
+    setTasks(updatedTasks);
+    closeModal(); 
+  };
+
+// Function to open modal
+const openModal = (task) => {
+  setSelectedTask(task); 
+  setIsModalOpen(true); 
+};
+
+// Function to close modal
+const closeModal = () => {
+  setIsModalOpen(false); 
+  setSelectedTask(null); 
+};
+
+
   return (
     <div className="container">
       <h2>Task List</h2>
@@ -180,6 +205,15 @@ function Home() {
         </select>
       </div>
 
+      <ul style={{ padding: 0 }}>
+        {tasks.map((task, index) => (
+          <li key={task.id}>
+            <span>{task.text} ({task.category})</span>
+            <button onClick={() => openModal(task)}>Details</button>
+          </li>
+        ))}
+      </ul>
+
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         <SortableContext items={tasks.map((task) => task.id)}>
           <ul style={{ padding: 0 }}>
@@ -204,6 +238,17 @@ function Home() {
           </ul>
         </SortableContext>
       </DndContext>
+
+      {isModalOpen && selectedTask && (
+  <TaskDetailsModal
+    isOpen={isModalOpen}
+    onRequestClose={closeModal}
+    task={selectedTask}
+    onSave={saveTaskDetails}
+  />
+)}
+
+
     </div>
   );
 }
