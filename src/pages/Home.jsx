@@ -6,9 +6,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { v4 as uuidv4 } from "uuid";
 import TaskDetailsModal from '../components/TaskDetailsModal';
 
-
 // SortableItem component for draggable list items
-function SortableItem({ id, task, index, onDelete, onEdit, toggleCompletion, editingIndex, setEditingIndex, editingText, setEditingText, saveTask }) {
+function SortableItem({ id, task, index, onDelete, onEdit, toggleCompletion, editingIndex, setEditingIndex, editingText, setEditingText, saveTask, openModal }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
 
   const backgroundColor = categoryColors[task.category] || categoryColors.Default;
@@ -37,6 +36,7 @@ function SortableItem({ id, task, index, onDelete, onEdit, toggleCompletion, edi
             onChange={(e) => setEditingText(e.target.value)}
           />
           <button onClick={() => saveTask(index)}>Save</button>
+          <button onClick={() => openModal(task)}>Details</button>
         </span>
       ) : (
         <span
@@ -159,20 +159,23 @@ function Home() {
       task.id === selectedTask.id ? { ...task, details } : task
     );
     setTasks(updatedTasks);
-    closeModal(); 
+    setIsModalOpen(false);  // Close modal
+    setSelectedTask(null);  // Clear selected task
   };
 
-// Function to open modal
-const openModal = (task) => {
-  setSelectedTask(task); 
-  setIsModalOpen(true); 
-};
+  // Function to open modal
+  const openModal = (task) => {
+    if (!isModalOpen) {
+      setSelectedTask(task); 
+      setIsModalOpen(true); 
+    }
+  };
 
-// Function to close modal
-const closeModal = () => {
-  setIsModalOpen(false); 
-  setSelectedTask(null); 
-};
+  // Function to close modal
+  const closeModal = () => {
+    setIsModalOpen(false); 
+    setSelectedTask(null); 
+  };
 
 
   return (
@@ -205,15 +208,6 @@ const closeModal = () => {
         </select>
       </div>
 
-      <ul style={{ padding: 0 }}>
-        {tasks.map((task, index) => (
-          <li key={task.id}>
-            <span>{task.text} ({task.category})</span>
-            <button onClick={() => openModal(task)}>Details</button>
-          </li>
-        ))}
-      </ul>
-
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         <SortableContext items={tasks.map((task) => task.id)}>
           <ul style={{ padding: 0 }}>
@@ -233,6 +227,7 @@ const closeModal = () => {
                   editingText={editingText}
                   setEditingText={setEditingText}
                   saveTask={saveTask}
+                  openModal={openModal} // function to open modal
                 />
               ))}
           </ul>
@@ -240,15 +235,13 @@ const closeModal = () => {
       </DndContext>
 
       {isModalOpen && selectedTask && (
-  <TaskDetailsModal
-    isOpen={isModalOpen}
-    onRequestClose={closeModal}
-    task={selectedTask}
-    onSave={saveTaskDetails}
-  />
-)}
-
-
+        <TaskDetailsModal
+          isOpen={isModalOpen}
+          onRequestClose={closeModal}
+          task={selectedTask}
+          onSave={saveTaskDetails}
+        />
+      )}
     </div>
   );
 }

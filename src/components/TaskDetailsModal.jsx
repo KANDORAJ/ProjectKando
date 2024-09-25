@@ -17,7 +17,7 @@ function TaskDetailsModal({ isOpen, onRequestClose, task, onSave }) {
   };
 
   return (
-    <Modal isOpen={isOpen} onRequestClose={onRequestClose} contentLabel="Task Details">
+    <Modal isOpen={isOpen} onRequestClose={onRequestClose} ariaHideApp={false} contentLabel="Task Details">
       <h2>Task Details</h2>
       <textarea
         value={details}
