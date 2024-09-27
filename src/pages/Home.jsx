@@ -48,6 +48,8 @@ function SortableItem({ id, task, index, onDelete, onEdit, toggleCompletion, edi
           }}
         >
           {task.text} ({task.category})
+          <br />
+          <small style={{ color: "#888" }}>{task.details}</small>
         </span>
       )}
       <div style={{ display: "flex", gap: "10px" }}>

@@ -17,7 +17,7 @@ function TaskDetailsModal({ isOpen, onRequestClose, task, onSave }) {
   };
 
   return (
-    <Modal isOpen={isOpen} onRequestClose={onRequestClose} ariaHideApp={false} contentLabel="Task Details">
+    <Modal isOpen={isOpen} onRequestClose={onRequestClose} ariaHideApp={false} contentLabel="Task Details" className="task-details-modal">
       <h2>Task Details</h2>
       <textarea
         value={details}
@@ -25,8 +25,10 @@ function TaskDetailsModal({ isOpen, onRequestClose, task, onSave }) {
         rows="5"
         style={{ width: '100%' }}
       />
-      <button onClick={handleSave}>Save</button>
-      <button onClick={onRequestClose}>Close</button>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
+  <button onClick={handleSave}>Save</button>
+  <button onClick={onRequestClose}>Close</button>
+</div>
     </Modal>
   );
 }

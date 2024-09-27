@@ -192,6 +192,28 @@ label {
   margin-right: 10px;
 }
 
+/* Modal Custom Styles */
+.task-details-modal {
+  width: 500px;
+  max-width: 90%;
+  margin: auto;
+  background-color: var(--container-bg-color);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px var(--container-shadow-color);
+  position: relative;
+}
+
+.task-details-modal textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+}
+
 /* Responsive Design */
 @media (max-width: 600px) {
   .container {
