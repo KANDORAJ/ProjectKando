@@ -49,7 +49,10 @@ function SortableItem({ id, task, index, onDelete, onEdit, toggleCompletion, edi
         >
           {task.text} ({task.category})
           <br />
-          <small style={{ color: "#888" }}>{task.details}</small>
+          <small style={{ color: "#888" }}>{task.details}
+          <br />
+          Due: {task.dueDate ? new Date(task.dueDate).toLocaleString() : "No deadline"}
+          </small>
         </span>
       )}
       <div style={{ display: "flex", gap: "10px" }}>
@@ -77,6 +80,7 @@ function Home() {
   const [darkMode, setDarkMode] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [dueDate, setDueDate] = useState("");
 
   // Load tasks from localStorage when component mounts
   useEffect(() => {
@@ -107,9 +111,10 @@ function Home() {
 
   const addTask = () => {
     if (task.trim() !== "") {
-      setTasks([...tasks, { id: uuidv4(), text: task, completed: false, category, details: "" }]);
+      setTasks([...tasks, { id: uuidv4(), text: task, completed: false, category, details: "", dueDate: dueDate }]);
       setTask("");
       setCategory("");
+      setDueDate("");
     }
   };
 
@@ -198,6 +203,12 @@ function Home() {
         <option value="Home">Home</option>
         <option value="Personal">Personal</option>
       </select>
+      
+      <input 
+      type="datetime-local"
+      value={dueDate}
+      onChange={(e) => setDueDate(e.target.value)}
+    />
       <button onClick={addTask}>Add Task</button>
 
       <div>
