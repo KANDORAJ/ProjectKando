@@ -116,6 +116,37 @@ button:hover {
   background-color: var(--button-hover-bg-color);
 }
 
+/* Date Picker Styling */
+.input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.input-container label {
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: #666;
+}
+
+.input-container input[type="datetime-local"] {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  width: 100%; 
+  max-width: 300px; 
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center; 
+}
+
+.input-container input[type="datetime-local"]:focus {
+  outline: none;
+  border-color: #007BFF;
+  box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
+}
+
 /* Task List */
 ul {
   list-style-type: none;
@@ -228,5 +259,9 @@ label {
     width: 100%;
     margin-top: 10px;
     padding: 12px 0;
+  }
+  
+  .input-container input {
+    width: 100%;
   }
 }

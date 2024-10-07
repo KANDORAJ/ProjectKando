@@ -204,11 +204,15 @@ function Home() {
         <option value="Personal">Personal</option>
       </select>
       
-      <input 
-      type="datetime-local"
-      value={dueDate}
-      onChange={(e) => setDueDate(e.target.value)}
-    />
+      <div className="input-container">
+  <label htmlFor="dueDate">Select Due Date</label>
+  <input
+    type="datetime-local"
+    id="dueDate"
+    value={dueDate}
+    onChange={(e) => setDueDate(e.target.value)}
+  />
+</div>
       <button onClick={addTask}>Add Task</button>
 
       <div>
