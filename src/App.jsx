@@ -6,6 +6,7 @@ import About from './pages/About';
 import Modal from 'react-modal';
 import './App.css';
 
+
 Modal.setAppElement('#root');
 
 function App() {
