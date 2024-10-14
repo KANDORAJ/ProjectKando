@@ -160,6 +160,19 @@ function Home() {
     document.body.classList.toggle('dark-mode', !darkMode);
   };
 
+  /*Cyberpunk Mode*/
+  const [cyberpunkMode, setCyberpunkMode] = useState(false);
+
+const toggleCyberpunkMode = () => {
+  setCyberpunkMode(!cyberpunkMode);
+  if (!cyberpunkMode) {
+    document.body.classList.add('cyberpunk-mode');
+    document.body.classList.remove('dark-mode');
+  } else {
+    document.body.classList.remove('cyberpunk-mode');
+  }
+};
+  
   // Function to save task details
   const saveTaskDetails = (details) => {
     const updatedTasks = tasks.map((task) =>
@@ -259,6 +272,9 @@ function Home() {
           onSave={saveTaskDetails}
         />
       )}
+      <button className="cyberpunk-toggle-btn" onClick={toggleCyberpunkMode}>
+        {cyberpunkMode ? 'Default Mode' : 'Cyberpunk Mode'}
+      </button>
     </div>
   );
 }

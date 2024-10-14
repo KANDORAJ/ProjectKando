@@ -8,7 +8,6 @@ function About() {
       <p>This app was developed to help you manage your tasks.</p>
       <p>Made By <a href="https://github.com/KANDORAJ" target="_blank" rel="noopener noreferrer">KANDORAJ</a></p>
       <div>
-      <h1>Calendar Page</h1>
       <MyCalendar />
     </div>
     </div>

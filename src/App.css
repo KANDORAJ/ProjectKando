@@ -25,6 +25,40 @@
   --li-hover-bg-color: #555555;
 }
 
+/* Cyberpunk Mode */
+.cyberpunk-mode {
+  --background-color: #0d0d0d;
+  background-image: url('https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/6225ada0-cab7-402f-b1d8-c43cd5e5b095/original=true,quality=90/isoCity_.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  --text-color: #00ffea;
+  --container-bg-color: rgba(0, 0, 0, 0.7); 
+  --button-bg-color: #ff007f;
+  --button-hover-bg-color: #ff1a8c;
+  --link-color: #00ccff;
+  --link-hover-bg-color: #1a1a1a;
+  --li-bg-color: rgba(50, 50, 50, 0.8);
+  --li-hover-bg-color: rgba(70, 70, 70, 0.9);
+}
+
+.cyberpunk-toggle-btn {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 10px 20px;
+  background-color: var(--button-bg-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.cyberpunk-toggle-btn:hover {
+  background-color: var(--button-hover-bg-color);
+}
+
 /* General Styles */
 body {
   font-family: 'Roboto', sans-serif;
