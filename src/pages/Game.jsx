@@ -11,22 +11,22 @@ const Game = () => {
   const meteorSpeed = 2;
   const bulletSpeed = 5;
   const FPS = 60;
+  const gameLoopRef = useRef(null);  // Ref to store the game loop interval
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
 
-    // Background and spaceship images
+    // Load background and spaceship images
     const bgImage = new Image();
     const shipImage = new Image();
 
     bgImage.src = 'https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/3eca82e9-3900-487c-be58-f5bb4d614fc6/original=true,quality=90/F8F735DF7AA70769647FB8132ED6A4D902E834504451CA39BC4C1F52F9E295A6.jpeg';
     shipImage.src = 'https://e7.pngegg.com/pngimages/329/505/png-clipart-grey-and-red-fighting-jet-illustration-spacecraft-spaceship-file-miscellaneous-airplane.png';
 
-    let gameInterval;
     let meteorInterval;
 
-    // Game logic
+    // Create a new meteor
     const createMeteor = () => {
       const size = Math.random() * 30 + 20;
       const x = Math.random() * canvas.width;
@@ -34,14 +34,16 @@ const Game = () => {
       setMeteors(prevMeteors => [...prevMeteors, { x, y, size }]);
     };
 
+    // Update meteors position
     const updateMeteors = () => {
       setMeteors(prevMeteors =>
         prevMeteors
-          .filter(meteor => meteor.y < canvas.height)
-          .map(meteor => ({ ...meteor, y: meteor.y + meteorSpeed }))
+          .filter(meteor => meteor.y < canvas.height) // Remove meteors that go out of bounds
+          .map(meteor => ({ ...meteor, y: meteor.y + meteorSpeed })) // Move meteors down
       );
     };
 
+    // Create a bullet at the current spaceship position
     const createBullet = () => {
       setBullets(prevBullets => [
         ...prevBullets,
@@ -49,14 +51,16 @@ const Game = () => {
       ]);
     };
 
+    // Update bullet position (move upwards)
     const updateBullets = () => {
       setBullets(prevBullets =>
         prevBullets
-          .filter(bullet => bullet.y > 0)
-          .map(bullet => ({ ...bullet, y: bullet.y - bulletSpeed }))
+          .filter(bullet => bullet.y > 0) // Remove bullets that go out of bounds
+          .map(bullet => ({ ...bullet, y: bullet.y - bulletSpeed })) // Move bullets upwards
       );
     };
 
+    // Check for collisions between bullets and meteors
     const checkCollisions = () => {
       setMeteors(prevMeteors =>
         prevMeteors.filter(meteor => {
@@ -71,16 +75,17 @@ const Game = () => {
               ) {
                 isHit = true;
                 setScore(prevScore => prevScore + 1);
-                return false;
+                return false; // Remove bullet if hit
               }
-              return true;
+              return true; // Keep bullet if not hit
             })
           );
-          return !isHit;
+          return !isHit; // Remove meteor if hit
         })
       );
     };
 
+    // Draw background with scrolling effect
     const drawBackground = () => {
       context.drawImage(bgImage, 0, bgY.current, canvas.width, canvas.height);
       context.drawImage(
@@ -90,14 +95,16 @@ const Game = () => {
         canvas.width,
         canvas.height
       );
-      bgY.current += 1;
-      if (bgY.current >= canvas.height) bgY.current = 0;
+      bgY.current += 1; // Scroll background
+      if (bgY.current >= canvas.height) bgY.current = 0; // Loop background
     };
 
+    // Draw the spaceship at the current position
     const drawShip = () => {
-      context.drawImage(shipImage, shipX.current - 20, shipY, 40, 40);
+      context.drawImage(shipImage, shipX.current - 20, shipY, 40, 40); // Draw spaceship
     };
 
+    // Draw meteors
     const drawMeteors = () => {
       meteors.forEach(meteor => {
         context.beginPath();
@@ -108,35 +115,40 @@ const Game = () => {
       });
     };
 
+    // Draw bullets
     const drawBullets = () => {
       bullets.forEach(bullet => {
         context.beginPath();
-        context.rect(bullet.x - 2, bullet.y - 10, 4, 10);
+        context.rect(bullet.x - 2, bullet.y - 10, 4, 10); // Draw bullet
         context.fillStyle = 'yellow';
         context.fill();
         context.closePath();
       });
     };
 
+    // Main game loop
     const gameLoop = () => {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      drawBackground();
-      drawShip();
-      drawMeteors();
-      drawBullets();
-      checkCollisions();
-      updateMeteors();
-      updateBullets();
+      context.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+      drawBackground(); // Draw scrolling background
+      drawShip(); // Draw spaceship
+      drawMeteors(); // Draw meteors
+      drawBullets(); // Draw bullets
+      checkCollisions(); // Check for collisions
+      updateMeteors(); // Move meteors
+      updateBullets(); // Move bullets
     };
 
     const startGame = () => {
-      gameInterval = setInterval(gameLoop, 1000 / FPS);
-      meteorInterval = setInterval(createMeteor, 2000);
+      if (!gameLoopRef.current) {  // Only start game loop if not already running
+        gameLoopRef.current = setInterval(gameLoop, 1000 / FPS);
+        meteorInterval = setInterval(createMeteor, 2000);
+      }
     };
 
     const stopGame = () => {
-      clearInterval(gameInterval);
+      clearInterval(gameLoopRef.current);
       clearInterval(meteorInterval);
+      gameLoopRef.current = null;  // Reset the game loop reference
     };
 
     bgImage.onload = () => {
@@ -149,13 +161,13 @@ const Game = () => {
   }, [meteors, bullets]);
 
   const handleMouseClick = () => {
-    createBullet();
+    createBullet(); // Create bullet on mouse click
   };
 
   const handleMouseMove = event => {
     const rect = canvasRef.current.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    shipX.current = mouseX;
+    const mouseX = event.clientX - rect.left; // Get mouse position relative to canvas
+    shipX.current = mouseX; // Update spaceship position
   };
 
   return (
