@@ -4,14 +4,23 @@ const Game = () => {
   const canvasRef = useRef(null);
   const shipX = useRef(400);
   const shipY = 500;
-  const bgY = useRef(0);
   const [meteors, setMeteors] = useState([]);
   const [bullets, setBullets] = useState([]);
   const [score, setScore] = useState(0);
-  const meteorSpeed = 2;
+  const meteorSpeed = 3;
   const bulletSpeed = 5;
   const FPS = 60;
-  const gameLoopRef = useRef(null);  // Ref to store the game loop interval
+  const gameLoopRef = useRef(null);
+  const [bgY, setBgY] = useState(0);  // State to track background's vertical position
+  const bgSpeed = 2;  // Speed of background scrolling
+
+  // Function to create a new bullet
+  const createBullet = () => {
+    setBullets(prevBullets => [
+      ...prevBullets,
+      { x: shipX.current, y: shipY }
+    ]);
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -41,14 +50,6 @@ const Game = () => {
           .filter(meteor => meteor.y < canvas.height) // Remove meteors that go out of bounds
           .map(meteor => ({ ...meteor, y: meteor.y + meteorSpeed })) // Move meteors down
       );
-    };
-
-    // Create a bullet at the current spaceship position
-    const createBullet = () => {
-      setBullets(prevBullets => [
-        ...prevBullets,
-        { x: shipX.current, y: shipY }
-      ]);
     };
 
     // Update bullet position (move upwards)
@@ -87,16 +88,13 @@ const Game = () => {
 
     // Draw background with scrolling effect
     const drawBackground = () => {
-      context.drawImage(bgImage, 0, bgY.current, canvas.width, canvas.height);
-      context.drawImage(
-        bgImage,
-        0,
-        bgY.current - canvas.height,
-        canvas.width,
-        canvas.height
-      );
-      bgY.current += 1; // Scroll background
-      if (bgY.current >= canvas.height) bgY.current = 0; // Loop background
+      context.drawImage(bgImage, 0, bgY, canvas.width, canvas.height); // Draw first background
+      context.drawImage(bgImage, 0, bgY - canvas.height, canvas.width, canvas.height); // Draw second background on top of the first
+    };
+
+    // Update background position
+    const updateBackground = () => {
+      setBgY(prevBgY => (prevBgY + bgSpeed) % canvas.height); // Scroll background down and reset when it reaches the end
     };
 
     // Draw the spaceship at the current position
@@ -136,6 +134,7 @@ const Game = () => {
       checkCollisions(); // Check for collisions
       updateMeteors(); // Move meteors
       updateBullets(); // Move bullets
+      updateBackground(); // Move background
     };
 
     const startGame = () => {
@@ -158,10 +157,10 @@ const Game = () => {
     return () => {
       stopGame();
     };
-  }, [meteors, bullets]);
+  }, [meteors, bullets, bgY]);
 
   const handleMouseClick = () => {
-    createBullet(); // Create bullet on mouse click
+    createBullet();
   };
 
   const handleMouseMove = event => {
@@ -178,7 +177,7 @@ const Game = () => {
         height={600}
         style={{ border: '1px solid #000', display: 'block', margin: '0 auto' }}
         onMouseMove={handleMouseMove}
-        onClick={handleMouseClick}
+        onClick={handleMouseClick}  // Clicking creates bullet
       />
       <div style={{ textAlign: 'center', marginTop: '10px' }}>Score: {score}</div>
     </>
