@@ -63,28 +63,43 @@ const Game = () => {
 
     // Check for collisions between bullets and meteors
     const checkCollisions = () => {
-      setMeteors(prevMeteors =>
-        prevMeteors.filter(meteor => {
-          let isHit = false;
-          setBullets(prevBullets =>
-            prevBullets.filter(bullet => {
-              if (
-                bullet.x > meteor.x &&
-                bullet.x < meteor.x + meteor.size &&
-                bullet.y > meteor.y &&
-                bullet.y < meteor.y + meteor.size
-              ) {
-                isHit = true;
-                setScore(prevScore => prevScore + 1);
-                return false; // Remove bullet if hit
-              }
-              return true; // Keep bullet if not hit
-            })
+      let updatedMeteors = [];
+      let bulletsToRemove = new Set(); // Track bullets that hit meteors
+    
+      meteors.forEach(meteor => {
+        let isHit = false;
+    
+        bullets.forEach((bullet, index) => {
+          const bulletHit = (
+            bullet.x > meteor.x &&
+            bullet.x < meteor.x + meteor.size &&
+            bullet.y > meteor.y &&
+            bullet.y < meteor.y + meteor.size
           );
-          return !isHit; // Remove meteor if hit
-        })
-      );
+    
+          if (bulletHit) {
+            isHit = true;
+            bulletsToRemove.add(index); // Mark bullet for removal
+            setScore(prevScore => prevScore + 1);
+          }
+        });
+    
+        // Only keep meteors that were not hit
+        if (!isHit) {
+          updatedMeteors.push(meteor);
+        }
+      });
+    
+      // Filter out bullets that hit meteors
+      const updatedBullets = bullets.filter((_, index) => !bulletsToRemove.has(index));
+    
+      // Update state with new arrays after all checks
+      setBullets(updatedBullets);
+      setMeteors(updatedMeteors);
     };
+    
+    
+    
 
     // Draw background with scrolling effect
     const drawBackground = () => {
