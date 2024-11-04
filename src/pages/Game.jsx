@@ -8,6 +8,7 @@ const Game = () => {
   const [meteors, setMeteors] = useState([]);   // Meteor array state
   const [bullets, setBullets] = useState([]);   // Bullet array state
   const [score, setScore] = useState(0);        // Score state
+    const [highScores, setHighScores] = useState([]); // High score list state
 
   // Game constants
   const meteorSpeed = 3;
@@ -16,6 +17,24 @@ const Game = () => {
   const gameLoopRef = useRef(null);  // Game loop reference for starting and stopping
   const [bgY, setBgY] = useState(0); // Background vertical position state
   const bgSpeed = 2;                 // Speed of background scrolling
+
+  // Load high scores from local storage
+  useEffect(() => {
+    const storedScores = JSON.parse(localStorage.getItem('highScores')) || [];
+    setHighScores(storedScores);
+  }, []);
+
+  // Save high scores to local storage
+  const saveHighScores = (newScores) => {
+    localStorage.setItem('highScores', JSON.stringify(newScores));
+  };
+
+  // Function to update high scores if needed
+  const updateHighScores = (newScore) => {
+    const updatedScores = [...highScores, newScore].sort((a, b) => b - a).slice(0, 5);
+    setHighScores(updatedScores);
+    saveHighScores(updatedScores);
+  };
 
   // Function to create a new bullet at the spaceship's position
   const createBullet = () => {
@@ -27,6 +46,7 @@ const Game = () => {
 
   // Function to reset the game (clear meteors, bullets, reset score, and reinitialize states)
   const resetGame = () => {
+  updateHighScores(score); // Update high scores with the final score
   setMeteors([]);
   setBullets([]);
   setScore(0);
@@ -219,6 +239,30 @@ const Game = () => {
         onClick={handleMouseClick}
       />
       <div style={{ textAlign: 'center', marginTop: '10px' }}>Score: {score}</div>
+      <div style={{ textAlign: 'center', marginTop: '20px', maxWidth: '400px', margin: '0 auto' }}>
+        <h3 style={{ marginBottom: '10px' }}>High Scores</h3>
+        <ul style={{
+          listStyleType: 'none',
+          padding: 0,
+          margin: 0,
+          border: '1px solid #ddd',
+          borderRadius: '8px',
+          backgroundColor: '#f5f5f5',
+          boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)'
+        }}>
+          {highScores.map((highScore, index) => (
+            <li key={index} style={{
+              padding: '10px',
+              borderBottom: index < highScores.length - 1 ? '1px solid #ddd' : 'none',
+              textAlign: 'center',
+              fontSize: '16px',
+              color: '#333'
+            }}>
+              Score: {highScore}
+            </li>
+          ))}
+        </ul>
+      </div>
     </>
   );
 };
