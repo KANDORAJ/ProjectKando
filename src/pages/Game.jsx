@@ -8,7 +8,8 @@ const Game = () => {
   const [meteors, setMeteors] = useState([]);   // Meteor array state
   const [bullets, setBullets] = useState([]);   // Bullet array state
   const [score, setScore] = useState(0);        // Score state
-    const [highScores, setHighScores] = useState([]); // High score list state
+  const [highScores, setHighScores] = useState([]); // High score list state
+  const [health, setHealth] = useState(3);      // Health state
 
   // Game constants
   const meteorSpeed = 3;
@@ -44,15 +45,16 @@ const Game = () => {
     ]);
   };
 
-  // Function to reset the game (clear meteors, bullets, reset score, and reinitialize states)
+  // Function to reset the game (clear meteors, bullets, reset score, reinitialize health, and restart game loop)
   const resetGame = () => {
-  updateHighScores(score); // Update high scores with the final score
-  setMeteors([]);
-  setBullets([]);
-  setScore(0);
-  stopGame();  // Stop the current game loop and meteor generation
-  startGame(); // Start a new game loop
-};
+    updateHighScores(score); // Update high scores with the final score
+    setMeteors([]);
+    setBullets([]);
+    setScore(0);
+    setHealth(3);  // Reset health to initial value
+    stopGame();    // Stop the current game loop and meteor generation
+    startGame();   // Start a new game loop
+  };
 
   useEffect(() => {
     // Set up canvas and images
@@ -124,7 +126,7 @@ const Game = () => {
         );
     
         if (shipCollision) {
-          resetGame(); // Fully reset the game if there's a collision with the spaceship
+          setHealth(prevHealth => prevHealth - 1); // Decrease health on collision
         }
     
         // Only keep meteors that were not hit
@@ -189,6 +191,11 @@ const Game = () => {
       updateMeteors();
       updateBullets();
       updateBackground();
+
+      // Reset game if health reaches 0
+      if (health <= 0) {
+        resetGame();
+      }
     };
 
     // Start the game loop and set up meteor spawning
@@ -206,26 +213,21 @@ const Game = () => {
       gameLoopRef.current = null;
     };
 
-    bgImage.onload = () => {
-      shipImage.onload = startGame; // Start game once images are loaded
-    };
+    bgImage.onload = () => startGame(); // Start the game once background image is loaded
 
-    // Clean up on component unmount
-    return () => {
-      stopGame();
-    };
-  }, [meteors, bullets, bgY]);
+    return () => stopGame(); // Cleanup on component unmount
+  }, [bullets, meteors, score, highScores, health, bgY]);
 
-  // Create bullet on mouse click
-  const handleMouseClick = () => {
-    createBullet();
+  // Handle spaceship movement based on mouse position
+  const handleMouseMove = (event) => {
+    const canvas = canvasRef.current;
+    const canvasRect = canvas.getBoundingClientRect();
+    shipX.current = event.clientX - canvasRect.left;
   };
 
-  // Update spaceship position based on mouse movement
-  const handleMouseMove = event => {
-    const rect = canvasRef.current.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    shipX.current = mouseX;
+  // Handle mouse click to shoot bullets
+  const handleMouseClick = () => {
+    createBullet();
   };
 
   return (
@@ -239,6 +241,7 @@ const Game = () => {
         onClick={handleMouseClick}
       />
       <div style={{ textAlign: 'center', marginTop: '10px' }}>Score: {score}</div>
+      <div style={{ textAlign: 'center', marginTop: '10px' }}>Health: {health}</div>
       <div style={{ textAlign: 'center', marginTop: '20px', maxWidth: '400px', margin: '0 auto' }}>
         <h3 style={{ marginBottom: '10px' }}>High Scores</h3>
         <ul style={{
