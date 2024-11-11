@@ -45,17 +45,6 @@ const Game = () => {
     ]);
   };
 
-  // Function to reset the game (clear meteors, bullets, reset score, reinitialize health, and restart game loop)
-  const resetGame = () => {
-    updateHighScores(score); // Update high scores with the final score
-    setMeteors([]);
-    setBullets([]);
-    setScore(0);
-    setHealth(3);  // Reset health to initial value
-    stopGame();    // Stop the current game loop and meteor generation
-    startGame();   // Start a new game loop
-  };
-
   useEffect(() => {
     // Set up canvas and images
     const canvas = canvasRef.current;
@@ -119,6 +108,7 @@ const Game = () => {
     
         // Check for collision between spaceship and meteor
         const shipCollision = (
+          !meteor.isCollided && // Check if meteor was already collided
           shipX.current > meteor.x - 20 &&
           shipX.current < meteor.x + meteor.size + 20 &&
           shipY > meteor.y &&
@@ -126,7 +116,12 @@ const Game = () => {
         );
     
         if (shipCollision) {
-          setHealth(prevHealth => prevHealth - 1); // Decrease health on collision
+          meteor.isCollided = true; // Mark meteor as collided
+          if (health > 1) {
+            setHealth(prevHealth => prevHealth - 1); // Decrease health
+          } else {
+            resetGame(); // Reset the game if health reaches 0
+          }
         }
     
         // Only keep meteors that were not hit
@@ -191,11 +186,6 @@ const Game = () => {
       updateMeteors();
       updateBullets();
       updateBackground();
-
-      // Reset game if health reaches 0
-      if (health <= 0) {
-        resetGame();
-      }
     };
 
     // Start the game loop and set up meteor spawning
@@ -213,10 +203,23 @@ const Game = () => {
       gameLoopRef.current = null;
     };
 
+
+
     bgImage.onload = () => startGame(); // Start the game once background image is loaded
 
     return () => stopGame(); // Cleanup on component unmount
   }, [bullets, meteors, score, highScores, health, bgY]);
+
+        // Function to reset the game (clear meteors, bullets, reset score, reinitialize health, and restart game loop)
+        const resetGame = () => {
+          updateHighScores(score); // Update high scores with the final score
+          setMeteors([]);
+          setBullets([]);
+          setScore(0);
+          setHealth(3);  // Reset health to initial value
+          stopGame();    // Stop the current game loop and meteor generation
+          startGame();   // Start a new game loop
+        };
 
   // Handle spaceship movement based on mouse position
   const handleMouseMove = (event) => {
