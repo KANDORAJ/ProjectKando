@@ -10,6 +10,7 @@ const Game = () => {
   const [score, setScore] = useState(0);        // Score state
   const [highScores, setHighScores] = useState([]); // High score list state
   const [health, setHealth] = useState(3);      // Health state
+  const [isPaused, setIsPaused] = useState(false); // Pause state
 
   // Game constants
   const meteorSpeed = 3;
@@ -60,81 +61,89 @@ const Game = () => {
 
     // Function to create a new meteor at a random position above the canvas
     const createMeteor = () => {
-      const size = Math.random() * 30 + 20;  // Random size between 20 and 50
-      const x = Math.random() * canvas.width;
-      const y = -size;
-      setMeteors(prevMeteors => [...prevMeteors, { x, y, size }]);
+      if (!isPaused) {
+        const size = Math.random() * 30 + 20;  // Random size between 20 and 50
+        const x = Math.random() * canvas.width;
+        const y = -size;
+        setMeteors(prevMeteors => [...prevMeteors, { x, y, size }]);
+      }
     };
 
     // Move meteors downward and remove those that go out of bounds
     const updateMeteors = () => {
-      setMeteors(prevMeteors =>
-        prevMeteors.filter(meteor => meteor.y < canvas.height)
-                    .map(meteor => ({ ...meteor, y: meteor.y + meteorSpeed }))
-      );
+      if (!isPaused) {
+        setMeteors(prevMeteors =>
+          prevMeteors.filter(meteor => meteor.y < canvas.height)
+            .map(meteor => ({ ...meteor, y: meteor.y + meteorSpeed }))
+        );
+      }
     };
 
     // Move bullets upward and remove those that go out of bounds
     const updateBullets = () => {
-      setBullets(prevBullets =>
-        prevBullets.filter(bullet => bullet.y > 0)
-          .map(bullet => ({ ...bullet, y: bullet.y - bulletSpeed }))
-      );
+      if (!isPaused) {
+        setBullets(prevBullets =>
+          prevBullets.filter(bullet => bullet.y > 0)
+            .map(bullet => ({ ...bullet, y: bullet.y - bulletSpeed }))
+        );
+      } 
     };
 
     // Check for collisions between bullets and meteors and between the spaceship and meteors
     const checkCollisions = () => {
-      let updatedMeteors = [];
-      let bulletsToRemove = new Set(); // Track bullets that hit meteors
-    
-      meteors.forEach(meteor => {
-        let isHit = false;
-    
-        // Check if any bullet hits the meteor
-        bullets.forEach((bullet, index) => {
-          const bulletHit = (
-            bullet.x > meteor.x &&
-            bullet.x < meteor.x + meteor.size &&
-            bullet.y > meteor.y &&
-            bullet.y < meteor.y + meteor.size
+      if (!isPaused) {
+        let updatedMeteors = [];
+        let bulletsToRemove = new Set(); // Track bullets that hit meteors
+      
+        meteors.forEach(meteor => {
+          let isHit = false;
+      
+          // Check if any bullet hits the meteor
+          bullets.forEach((bullet, index) => {
+            const bulletHit = (
+              bullet.x > meteor.x &&
+              bullet.x < meteor.x + meteor.size &&
+              bullet.y > meteor.y &&
+              bullet.y < meteor.y + meteor.size
+            );
+      
+            if (bulletHit) {
+              isHit = true;
+              bulletsToRemove.add(index); // Mark bullet for removal
+              setScore(prevScore => prevScore + 1); // Increase score
+            }
+          });
+      
+          // Check for collision between spaceship and meteor
+          const shipCollision = (
+            !meteor.isCollided && // Check if meteor was already collided
+            shipX.current > meteor.x - 20 &&
+            shipX.current < meteor.x + meteor.size + 20 &&
+            shipY > meteor.y &&
+            shipY < meteor.y + meteor.size
           );
-    
-          if (bulletHit) {
-            isHit = true;
-            bulletsToRemove.add(index); // Mark bullet for removal
-            setScore(prevScore => prevScore + 1); // Increase score
+      
+          if (shipCollision) {
+            meteor.isCollided = true; // Mark meteor as collided
+            if (health > 1) {
+              setHealth(prevHealth => prevHealth - 1); // Decrease health
+            } else {
+              resetGame(); // Reset the game if health reaches 0
+            }
+          }
+      
+          // Only keep meteors that were not hit
+          if (!isHit) {
+            updatedMeteors.push(meteor);
           }
         });
-    
-        // Check for collision between spaceship and meteor
-        const shipCollision = (
-          !meteor.isCollided && // Check if meteor was already collided
-          shipX.current > meteor.x - 20 &&
-          shipX.current < meteor.x + meteor.size + 20 &&
-          shipY > meteor.y &&
-          shipY < meteor.y + meteor.size
-        );
-    
-        if (shipCollision) {
-          meteor.isCollided = true; // Mark meteor as collided
-          if (health > 1) {
-            setHealth(prevHealth => prevHealth - 1); // Decrease health
-          } else {
-            resetGame(); // Reset the game if health reaches 0
-          }
-        }
-    
-        // Only keep meteors that were not hit
-        if (!isHit) {
-          updatedMeteors.push(meteor);
-        }
-      });
-    
-      // Filter out bullets that hit meteors
-      const updatedBullets = bullets.filter((_, index) => !bulletsToRemove.has(index));
-    
-      setBullets(updatedBullets);    // Update bullets
-      setMeteors(updatedMeteors);    // Update meteors
+      
+        // Filter out bullets that hit meteors
+        const updatedBullets = bullets.filter((_, index) => !bulletsToRemove.has(index));
+      
+        setBullets(updatedBullets);    // Update bullets
+        setMeteors(updatedMeteors);    // Update meteors
+      }  
     };
 
     // Draw background with scrolling effect
@@ -145,7 +154,9 @@ const Game = () => {
 
     // Scroll the background downwards and reset when it reaches the end
     const updateBackground = () => {
-      setBgY(prevBgY => (prevBgY + bgSpeed) % canvas.height);
+      if (!isPaused) {
+        setBgY(prevBgY => (prevBgY + bgSpeed) % canvas.height);
+      }
     };
 
     // Draw spaceship at current position
@@ -203,29 +214,33 @@ const Game = () => {
       gameLoopRef.current = null;
     };
 
-
-
     bgImage.onload = () => startGame(); // Start the game once background image is loaded
 
     return () => stopGame(); // Cleanup on component unmount
-  }, [bullets, meteors, score, highScores, health, bgY]);
+  }, [bullets, meteors, score, highScores, health, bgY, isPaused]);
 
-        // Function to reset the game (clear meteors, bullets, reset score, reinitialize health, and restart game loop)
-        const resetGame = () => {
-          updateHighScores(score); // Update high scores with the final score
-          setMeteors([]);
-          setBullets([]);
-          setScore(0);
-          setHealth(3);  // Reset health to initial value
-          stopGame();    // Stop the current game loop and meteor generation
-          startGame();   // Start a new game loop
-        };
+  const togglePause = () => {
+    setIsPaused(prev => !prev);
+  };
+
+  // Function to reset the game (clear meteors, bullets, reset score, reinitialize health, and restart game loop)
+  const resetGame = () => {
+    updateHighScores(score); // Update high scores with the final score
+    setMeteors([]);
+    setBullets([]);
+    setScore(0);
+    setHealth(3);  // Reset health to initial value
+    stopGame();    // Stop the current game loop and meteor generation
+    startGame();   // Start a new game loop
+  };
 
   // Handle spaceship movement based on mouse position
   const handleMouseMove = (event) => {
-    const canvas = canvasRef.current;
-    const canvasRect = canvas.getBoundingClientRect();
-    shipX.current = event.clientX - canvasRect.left;
+    if (!isPaused) {
+      const canvas = canvasRef.current;
+      const canvasRect = canvas.getBoundingClientRect();
+      shipX.current = event.clientX - canvasRect.left;
+    }
   };
 
   // Handle mouse click to shoot bullets
@@ -245,6 +260,9 @@ const Game = () => {
       />
       <div style={{ textAlign: 'center', marginTop: '10px' }}>Score: {score}</div>
       <div style={{ textAlign: 'center', marginTop: '10px' }}>Health: {health}</div>
+      <button onClick={togglePause} style={{ display: 'block', margin: '10px auto' }}>
+        {isPaused ? 'Resume' : 'Pause'}
+      </button>
       <div style={{ textAlign: 'center', marginTop: '20px', maxWidth: '400px', margin: '0 auto' }}>
         <h3 style={{ marginBottom: '10px' }}>High Scores</h3>
         <ul style={{
