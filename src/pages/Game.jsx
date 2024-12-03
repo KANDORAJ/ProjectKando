@@ -1,4 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
+import spaceShipImg from '../assets/images/aircraft.png';
+import bulletSoundFile from  '../assets/sounds/laserPewPew.mp3';
+import collisionSoundFile from '../assets/sounds/vine-boom.mp3'
+import backgroundMusic from '../assets/sounds/Vendetta.mp3';
 
 const Game = () => {
   // Canvas and spaceship position references
@@ -40,10 +44,43 @@ const Game = () => {
 
   // Function to create a new bullet at the spaceship's position
   const createBullet = () => {
+    playBulletSound();
     setBullets(prevBullets => [
       ...prevBullets,
       { x: shipX.current, y: shipY }
     ]);
+  };
+
+  // Sound Section
+  const bulletSoundRef = useRef(null);          // Reference for bullet sound
+  const collisionSoundRef = useRef(null);       // Reference for collision sound
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    bulletSoundRef.current = new Audio(bulletSoundFile);
+    collisionSoundRef.current = new Audio(collisionSoundFile);
+    const audio = audioRef.current;
+    if (audio) {
+      audio.volume = 0.5; 
+      audio.loop = true; 
+      audio.play().catch((error) => {
+        console.error("Sound Play Error:", error);
+      });
+    }
+    return () => {
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0; // Reset audio to start
+      }
+    };
+  }, []);
+
+  const playBulletSound = () => {
+    bulletSoundRef.current?.play();
+  };
+  
+  const playCollisionSound = () => {
+    collisionSoundRef.current?.play();
   };
 
   useEffect(() => {
@@ -55,7 +92,7 @@ const Game = () => {
 
     // Background and spaceship image sources
     bgImage.src = 'https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/3eca82e9-3900-487c-be58-f5bb4d614fc6/original=true,quality=90/F8F735DF7AA70769647FB8132ED6A4D902E834504451CA39BC4C1F52F9E295A6.jpeg';
-    shipImage.src = 'https://e7.pngegg.com/pngimages/329/505/png-clipart-grey-and-red-fighting-jet-illustration-spacecraft-spaceship-file-miscellaneous-airplane.png';
+    shipImage.src = spaceShipImg;
 
     let meteorInterval;  // Reference for the interval that creates meteors
 
@@ -125,6 +162,7 @@ const Game = () => {
       
           if (shipCollision) {
             meteor.isCollided = true; // Mark meteor as collided
+            playCollisionSound();
             if (health > 1) {
               setHealth(prevHealth => prevHealth - 1); // Decrease health
             } else {
@@ -263,6 +301,7 @@ const Game = () => {
       <button onClick={togglePause} style={{ display: 'block', margin: '10px auto' }}>
         {isPaused ? 'Resume' : 'Pause'}
       </button>
+      <audio ref={audioRef} src={backgroundMusic} />
       <div style={{ textAlign: 'center', marginTop: '20px', maxWidth: '400px', margin: '0 auto' }}>
         <h3 style={{ marginBottom: '10px' }}>High Scores</h3>
         <ul style={{

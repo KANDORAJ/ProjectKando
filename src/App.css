@@ -28,7 +28,7 @@
 /* Cyberpunk Mode */
 .cyberpunk-mode {
   --background-color: #0d0d0d;
-  background-image: url('https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/6225ada0-cab7-402f-b1d8-c43cd5e5b095/original=true,quality=90/isoCity_.jpeg');
+  background-image: url('../src/assets/images/isoCity_.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
