@@ -23,6 +23,7 @@ const Game = () => {
   const gameLoopRef = useRef(null);  // Game loop reference for starting and stopping
   const [bgY, setBgY] = useState(0); // Background vertical position state
   const bgSpeed = 2;                 // Speed of background scrolling
+  const [volume, setVolume] = useState(0.5); // Volume state
 
   // Load high scores from local storage
   useEffect(() => {
@@ -61,7 +62,7 @@ const Game = () => {
     collisionSoundRef.current = new Audio(collisionSoundFile);
     const audio = audioRef.current;
     if (audio) {
-      audio.volume = 0.5; 
+      audio.volume = volume;
       audio.loop = true; 
       audio.play().catch((error) => {
         console.error("Sound Play Error:", error);
@@ -75,12 +76,24 @@ const Game = () => {
     };
   }, []);
 
+  useEffect(() => {
+    // Update volume for all audio elements
+    if (bulletSoundRef.current) bulletSoundRef.current.volume = volume;
+    if (collisionSoundRef.current) collisionSoundRef.current.volume = volume;
+    if (audioRef.current) audioRef.current.volume = volume;
+  }, [volume]);
+
   const playBulletSound = () => {
     bulletSoundRef.current?.play();
   };
   
   const playCollisionSound = () => {
     collisionSoundRef.current?.play();
+  };
+
+  const handleVolumeChange = (event) => {
+    const newVolume = parseFloat(event.target.value);
+    setVolume(newVolume);
   };
 
   useEffect(() => {
@@ -302,6 +315,18 @@ const Game = () => {
         {isPaused ? 'Resume' : 'Pause'}
       </button>
       <audio ref={audioRef} src={backgroundMusic} />
+      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+        <label htmlFor="volume-slider">Volume: </label>
+        <input
+          id="volume-slider"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={volume}
+          onChange={handleVolumeChange}
+        />
+      </div>
       <div style={{ textAlign: 'center', marginTop: '20px', maxWidth: '400px', margin: '0 auto' }}>
         <h3 style={{ marginBottom: '10px' }}>High Scores</h3>
         <ul style={{
