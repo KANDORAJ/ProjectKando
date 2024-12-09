@@ -38,9 +38,11 @@ const Game = () => {
 
   // Function to update high scores if needed
   const updateHighScores = (newScore) => {
-    const updatedScores = [...highScores, newScore].sort((a, b) => b - a).slice(0, 5);
-    setHighScores(updatedScores);
-    saveHighScores(updatedScores);
+    if (newScore > 0 && !highScores.includes(newScore)) {
+      const updatedScores = [...highScores, newScore].sort((a, b) => b - a).slice(0, 5);
+      setHighScores(updatedScores);
+      saveHighScores(updatedScores);
+    }
   };
 
   // Function to create a new bullet at the spaceship's position
