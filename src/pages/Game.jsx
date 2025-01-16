@@ -86,12 +86,20 @@ const Game = () => {
   }, [volume]);
 
   const playBulletSound = () => {
-    bulletSoundRef.current?.play();
+    if (bulletSoundRef.current) {
+      bulletSoundRef.current.currentTime = 0; // Reset the sound to the beginning
+      bulletSoundRef.current.play(); // Play the sound
+    }
   };
   
+  
   const playCollisionSound = () => {
-    collisionSoundRef.current?.play();
-  };
+    if (collisionSoundRef.current) {
+      collisionSoundRef.current.currentTime = 0; // Reset the sound to the beginning
+      collisionSoundRef.current.play(); // Play the sound
+    }
+  }
+    
 
   const handleVolumeChange = (event) => {
     const newVolume = parseFloat(event.target.value);
